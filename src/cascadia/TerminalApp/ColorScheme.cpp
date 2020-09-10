@@ -141,6 +141,30 @@ void ColorScheme::LayerJson(const Json::Value& json)
     }
 }
 
+Json::Value ColorScheme::ToJson(const TerminalApp::ColorScheme& scheme)
+{
+    Json::Value json{ Json::ValueType::objectValue };
+    const auto schemeImpl{ winrt::get_self<implementation::ColorScheme>(scheme) };
+    schemeImpl->UpdateJson(json);
+    return json;
+}
+
+void ColorScheme::UpdateJson(Json::Value& json)
+{
+    JsonUtils::SetValueForKey(json, NameKey, _schemeName);
+    JsonUtils::SetValueForKey(json, ForegroundKey, _defaultForeground);
+    JsonUtils::SetValueForKey(json, BackgroundKey, _defaultBackground);
+    JsonUtils::SetValueForKey(json, SelectionBackgroundKey, _selectionBackground);
+    JsonUtils::SetValueForKey(json, CursorColorKey, _cursorColor);
+
+    int i = 0;
+    for (const auto& current : TableColors)
+    {
+        JsonUtils::SetValueForKey(json, current, _table.at(i));
+        i++;
+    }
+}
+
 winrt::hstring ColorScheme::Name() const noexcept
 {
     return _schemeName;
